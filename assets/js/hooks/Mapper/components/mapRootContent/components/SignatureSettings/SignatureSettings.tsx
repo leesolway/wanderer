@@ -95,7 +95,12 @@ export const SignatureSettings = ({ systemId, show, onHide, signatureData }: Map
           }
 
           if (values.temporary_name != null) {
-            out = { ...out, temporary_name: values.temporary_name };
+            // 418
+            const regex = /^([A-Za-z0-9]{1,3}(?:-\d{1,3})+)/;
+            const match = values.temporary_name.trim().match(regex);
+            const temporary_name = match ? match[1] : values.temporary_name;
+
+            out = { ...out, temporary_name };
           }
 
           if (signatureData.group !== SignatureGroup.Wormhole) {
@@ -185,7 +190,7 @@ export const SignatureSettings = ({ systemId, show, onHide, signatureData }: Map
     <Dialog
       header={`Signature Edit [${signatureData?.eve_id}]`}
       visible={show}
-      draggable={false}
+      draggable={true}
       style={{ width: '390px' }}
       onShow={handleShow}
       onHide={() => {
