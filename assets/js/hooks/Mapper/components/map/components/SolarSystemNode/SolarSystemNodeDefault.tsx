@@ -125,17 +125,20 @@ export const SolarSystemNodeDefault = memo((props: NodeProps<MapSolarSystemType>
             </div>
 
             <div className={clsx(classes.BottomRow, 'flex items-center justify-between')}>
-              {nodeVars.customName && (
-                <div className="[text-shadow:_0_1px_0_rgb(0_0_0_/_40%)] text-blue-300 whitespace-nowrap overflow-hidden text-ellipsis mr-0.5">
-                  {nodeVars.customName}
-                </div>
-              )}
-
-              {!nodeVars.isWormhole && !nodeVars.customName && (
-                <div className="[text-shadow:_0_1px_0_rgb(0_0_0_/_40%)] text-stone-300 whitespace-nowrap overflow-hidden text-ellipsis mr-0.5">
-                  {nodeVars.regionName}
-                </div>
-              )}
+              {/* 418 */}
+              <div className="[text-shadow:_0_1px_0_rgb(0_0_0_/_40%)] whitespace-nowrap overflow-hidden text-ellipsis mr-0.5">
+                {nodeVars.customName ? (
+                  <>
+                    <span className="text-blue-300">{nodeVars.solarSystemName}</span>
+                    {!nodeVars.isWormhole && nodeVars.regionName && (
+                      <span className="text-stone-300 ml-1 align-baseline">{nodeVars.regionName}</span>
+                    )}
+                  </>
+                ) : (
+                  !nodeVars.isWormhole &&
+                  nodeVars.regionName && <span className="text-stone-300 align-baseline">{nodeVars.regionName}</span>
+                )}
+              </div>
 
               {nodeVars.isWormhole && !nodeVars.customName && <div />}
 
