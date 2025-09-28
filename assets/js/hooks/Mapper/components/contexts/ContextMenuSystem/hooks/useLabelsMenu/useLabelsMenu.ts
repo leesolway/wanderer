@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { LABELS, LABELS_INFO, LABELS_ORDER } from '@/hooks/Mapper/components/map/constants.ts';
 import { GRADIENT_MENU_ACTIVE_CLASSES } from '@/hooks/Mapper/constants.ts';
 import { LabelsManager } from '@/hooks/Mapper/utils/labelsManager.ts';
+import { useMapGetOption } from '@/hooks/Mapper/mapRootProvider/hooks/api';
 
 export const getLabels = (labels: string | null) => (labels ? (labels ?? '').split(',') : []);
 export const updateLabels = (labels: string | null, label: string) => {
@@ -30,6 +31,29 @@ export const useLabelsMenu = (
   const ref = useRef({ onSystemLabels, systemId, systems, onCustomLabelDialog });
   ref.current = { onSystemLabels, systemId, systems, onCustomLabelDialog };
 
+  // Read custom labels catalog from options (may be array or JSON string)
+  const rawCustom = useMapGetOption('custom_labels');
+  const customDefs: Array<{ id: string; name: string; shortName: string }> =
+    Array.isArray(rawCustom)
+      ? (rawCustom as Array<{ id: string; name: string; shortName: string }>)
+      : typeof rawCustom === 'string'
+        ? (() => {
+            try {
+              const parsed = JSON.parse(rawCustom);
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+
+  const CUSTOM_LABELS_INFO: Record<string, { id: string; name: string; shortName: string }> =
+    customDefs.reduce((acc, x) => ({ ...acc, [x.id]: x }), {} as Record<string, { id: string; name: string; shortName: string }>);
+
+  const RUNTIME_LABELS_ORDER: string[] = [...LABELS_ORDER, ...Object.keys(CUSTOM_LABELS_INFO)];
+
+  const resolveInfo = (id: string) => (LABELS_INFO as any)[id] ?? CUSTOM_LABELS_INFO[id] ?? { id, name: id, shortName: id };
+
   return useCallback(() => {
     const { onSystemLabels, systemId, systems, onCustomLabelDialog } = ref.current;
     const system = systemId ? getSystemById(systems, systemId) : undefined;
@@ -45,9 +69,8 @@ export const useLabelsMenu = (
       ];
     }
 
-    // const labels = getLabels(system.labels);
     const hasLabels = labels?.list?.length > 0;
-    const statusList = hasLabels ? LABELS_ORDER : LABELS_ORDER.slice(1);
+    const statusList = hasLabels ? RUNTIME_LABELS_ORDER : RUNTIME_LABELS_ORDER.filter(x => x !== LABELS.clear);
 
     return [
       {
@@ -74,7 +97,7 @@ export const useLabelsMenu = (
           },
           { separator: true },
           ...statusList.map(x => ({
-            label: LABELS_INFO[x].name,
+            label: resolveInfo(x).name,
             icon: x === LABELS.clear ? PrimeIcons.TRASH : PrimeIcons.BOOKMARK,
             command: () => {
               if (x === LABELS.clear) {
@@ -91,5 +114,5 @@ export const useLabelsMenu = (
         ],
       },
     ];
-  }, []);
+  }, [CUSTOM_LABELS_INFO, RUNTIME_LABELS_ORDER]);
 };

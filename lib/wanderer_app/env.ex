@@ -87,6 +87,24 @@ defmodule WandererApp.Env do
   def get_key(key, default \\ nil), do: Application.get_env(@app, key, default)
 
   @doc """
+  Return custom labels catalog from env as a list of maps.
+  Expected format (string JSON or already a list):
+  [ %{"id" => "stg", "name" => "Staging", "shortName" => "STG"}, ... ]
+  """
+  def custom_labels() do
+    case get_key(:custom_labels, "[]") do
+      val when is_binary(val) ->
+        case Jason.decode(val) do
+          {:ok, arr} when is_list(arr) -> arr
+          _ -> []
+        end
+
+      arr when is_list(arr) -> arr
+      _ -> []
+    end
+  end
+
+  @doc """
   A single map containing environment variables
   made available to react
   """

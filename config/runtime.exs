@@ -156,6 +156,8 @@ config :wanderer_app,
   wallet_tracking_enabled: wallet_tracking_enabled,
   restrict_maps_creation: restrict_maps_creation,
   restrict_acls_creation: restrict_acls_creation,
+  # Custom labels catalog from env or secret file; string JSON expected
+  custom_labels: get_var_from_path_or_env("WANDERER_CUSTOM_LABELS", "[]"),
   subscription_settings: %{
     plans: [
       %{

@@ -656,6 +656,10 @@ defmodule WandererAppWeb.MapCoreEventHandler do
       map_id
       |> WandererApp.Map.get_options()
 
+    # Inject env-driven custom labels into options so the client can use them
+    custom_labels = WandererApp.Env.custom_labels()
+    options = Map.put(options, "custom_labels", custom_labels)
+
     map_characters =
       map_id
       |> WandererApp.Map.list_characters()
