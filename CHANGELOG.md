@@ -2,6 +2,33 @@
 
 <!-- changelog -->
 
+## [v1.80.0](https://github.com/wanderer-industries/wanderer/compare/v1.79.3...v1.80.0) (2025-09-28)
+
+
+
+
+### Features:
+
+* Core: Updated connections EOL logic
+
+* Core: added support for jumpgates connection type
+
+### Bug Fixes:
+
+* Core: Fixed connection passages count
+
+* Map: Fixed eslint problems
+
+* Map: Add support for Bridge. Made all tooltips left and right paddings.
+
+* pr feedback
+
+* Map: Update lifetime design and buttons
+
+* Map: Update wormhole lifetime UI and removed unnecessary code
+
+* removed wormhole only logic error
+
 ## [v1.79.3](https://github.com/wanderer-industries/wanderer/compare/v1.79.2...v1.79.3) (2025-09-27)
 
 
