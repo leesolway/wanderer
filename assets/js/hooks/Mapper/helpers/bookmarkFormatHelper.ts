@@ -46,7 +46,8 @@ const getSpawnTypeString = (
   if (signatureType === 'K162') {
     return mapping?.spawn_k162 !== undefined ? mapping.spawn_k162 : 'K162';
   }
-  if (currentSystemStatics?.includes(signatureType)) {
+  if (currentSystemStatics === undefined) return '';
+  if (currentSystemStatics.includes(signatureType)) {
     return mapping?.spawn_static !== undefined ? mapping.spawn_static : 'Static';
   }
   return mapping?.spawn_wandering !== undefined ? mapping.spawn_wandering : 'Wandering';
