@@ -29,8 +29,9 @@ const getTimeStatusString = (status?: TimeStatus, mapping?: Record<string, strin
   }
 };
 
-const getDirectionString = (isIncoming: boolean, mapping?: Record<string, string>): string => {
-  if (isIncoming) {
+const getDirectionString = (signatureType: string | undefined, mapping?: Record<string, string>): string => {
+  if (!signatureType) return '';
+  if (signatureType === 'K162') {
     return mapping?.direction_incoming !== undefined ? mapping.direction_incoming : 'In';
   }
   return mapping?.direction_outgoing !== undefined ? mapping.direction_outgoing : 'Out';
@@ -384,8 +385,8 @@ export const formatBookmarkName = (
   // Replace {description} -> signature.description
   result = result.replace(/\{description\}/g, () => signature.description || '');
 
-  // Replace {direction} -> incoming (K162) or outgoing (all other types)
-  result = result.replace(/\{direction\}/g, () => getDirectionString(signature.type === 'K162', mapping));
+  // Replace {direction} -> incoming (K162), outgoing (other known types), or '' (unknown)
+  result = result.replace(/\{direction\}/g, () => getDirectionString(signature.type, mapping));
 
   // Replace {spawn_type} -> Static or Wandering for outgoing wormholes, or K162 for incoming
   result = result.replace(/\{spawn_type\}/g, () => getSpawnTypeString(signature.type, currentSystemStatics, mapping));
