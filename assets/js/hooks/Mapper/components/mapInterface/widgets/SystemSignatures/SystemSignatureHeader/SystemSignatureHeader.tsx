@@ -16,6 +16,8 @@ import { useMapRootState } from '@/hooks/Mapper/mapRootProvider';
 
 export type HeaderProps = {
   sigCount: number;
+  scannedCount: number;
+  totalCount: number;
   lazyDeleteValue: boolean;
   onLazyDeleteChange: (checked: boolean) => void;
   pendingCount: number;
@@ -26,6 +28,8 @@ export type HeaderProps = {
 
 export const SystemSignaturesHeader = ({
   sigCount,
+  scannedCount,
+  totalCount,
   lazyDeleteValue,
   onLazyDeleteChange,
   pendingCount,
@@ -43,6 +47,9 @@ export const SystemSignaturesHeader = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const isCompact = useMaxWidth(containerRef, COMPACT_MAX_WIDTH);
 
+  const scannedPct = totalCount > 0 ? Math.round((scannedCount / totalCount) * 100) : 0;
+  const unknownCount = totalCount - scannedCount;
+
   return (
     <div ref={containerRef} className="w-full">
       <div className="flex justify-between items-center text-xs w-full h-full">
@@ -54,6 +61,23 @@ export const SystemSignaturesHeader = ({
           )}
           {!isNotSelectedSystem && <SystemView systemId={systemId} className="select-none text-center" hideRegion />}
         </div>
+
+        {!isCompact && totalCount > 0 && (
+          <WdTooltipWrapper
+            className="shrink-0"
+            content={`${scannedCount}/${totalCount} scanned (${unknownCount} unknown)`}
+          >
+            <div className="flex items-center gap-1.5 select-none">
+              <div className="w-10 h-1.5 rounded-full bg-neutral-700/60 overflow-hidden shrink-0">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+                  style={{ width: `${scannedPct}%` }}
+                />
+              </div>
+              <div className="text-stone-400 whitespace-nowrap">{scannedPct}%</div>
+            </div>
+          </WdTooltipWrapper>
+        )}
 
         <LayoutEventBlocker className="flex gap-2.5">
           <WdTooltipWrapper content="Enable Lazy delete">

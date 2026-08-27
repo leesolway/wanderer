@@ -3,6 +3,7 @@ import { SETTINGS_KEYS, SIGNATURE_WINDOW_ID, SignatureSettingsType } from '@/hoo
 import { useHotkey } from '@/hooks/Mapper/hooks/useHotkey';
 import { useMapRootState } from '@/hooks/Mapper/mapRootProvider';
 import { useCallback, useMemo, useState } from 'react';
+import { isSignatureResolved } from './helpers';
 import { useSignatureUndo } from './hooks/useSignatureUndo';
 import { useSystemSignaturesData } from './hooks/useSystemSignaturesData';
 import { SystemSignaturesHeader } from './SystemSignatureHeader';
@@ -48,6 +49,13 @@ export const SystemSignatures = () => {
   const sigCount = useMemo(() => signatures.length, [signatures]);
   const deletedSignatures = useMemo(() => signatures.filter(s => s.deleted), [signatures]);
 
+  const scanProgress = useMemo(() => {
+    const activeSignatures = signatures.filter(s => !s.deleted);
+    const total = activeSignatures.length;
+    const scanned = activeSignatures.filter(isSignatureResolved).length;
+    return { total, scanned };
+  }, [signatures]);
+
   const { countdown, handleUndo } = useSignatureUndo(systemId, settingsSignatures, deletedSignatures, outCommand);
 
   useHotkey(true, ['z', 'Z'], (event: KeyboardEvent) => {
@@ -73,6 +81,8 @@ export const SystemSignatures = () => {
       label={
         <SystemSignaturesHeader
           sigCount={sigCount}
+          scannedCount={scanProgress.scanned}
+          totalCount={scanProgress.total}
           lazyDeleteValue={settingsSignatures[SETTINGS_KEYS.LAZY_DELETE_SIGNATURES] as boolean}
           pendingCount={deletedSignatures.length}
           undoCountdown={countdown}
