@@ -9,10 +9,6 @@ defmodule WandererApp.Map.Audit do
   require Ash.Query
   require Logger
 
-  @week_seconds :timer.hours(24 * 7)
-  @month_seconds @week_seconds * 4
-  @audit_expired_seconds @month_seconds * 3
-
   def track_map_subscription_event(event_type, metadata) do
     mapped_type =
       case event_type do
@@ -45,5 +41,9 @@ defmodule WandererApp.Map.Audit do
   defdelegate track_map_event(event_type, metadata),
     to: WandererApp.SecurityAudit
 
-  defp get_expired_at(), do: DateTime.utc_now() |> DateTime.add(-@audit_expired_seconds, :second)
+  defp get_expired_at() do
+    retention_seconds = WandererApp.Env.audit_retention_days() * 24 * 60 * 60
+
+    DateTime.utc_now() |> DateTime.add(-retention_seconds, :second)
+  end
 end
