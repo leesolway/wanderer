@@ -7,14 +7,15 @@ defmodule WandererApp.Map.GarbageCollector do
   require Ash.Query
 
   @logger Application.compile_env(:wanderer_app, :logger)
-  @one_week_seconds 7 * 24 * 60 * 60
   @two_weeks_seconds 14 * 24 * 60 * 60
 
   def cleanup_chain_passages() do
     Logger.info("Start cleanup old map chain passages...")
 
+    retention_seconds = WandererApp.Env.chain_passages_retention_days() * 24 * 60 * 60
+
     WandererApp.Api.MapChainPassages
-    |> Ash.Query.filter(updated_at: [less_than: get_cutoff_time(@one_week_seconds)])
+    |> Ash.Query.filter(updated_at: [less_than: get_cutoff_time(retention_seconds)])
     |> Ash.bulk_destroy!(:destroy, %{}, batch_size: 100)
 
     @logger.info(fn -> "All map chain passages processed" end)

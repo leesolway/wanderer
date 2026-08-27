@@ -112,6 +112,8 @@ defmodule WandererApp.Env do
   def map_connection_eol_expire_timeout_mins(),
     do: get_key(:map_connection_eol_expire_timeout_mins)
 
+  def chain_passages_retention_days(), do: get_key(:chain_passages_retention_days, 7)
+
   def get_key(key, default \\ nil), do: Application.get_env(@app, key, default)
 
   @doc """
